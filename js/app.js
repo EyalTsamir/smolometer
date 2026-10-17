@@ -32,7 +32,6 @@
     start: $("#start-btn"),
     back: $("#back-btn"),
     progress: $("#progress"),
-    progressFill: $("#progress-fill"),
     progressCount: $("#progress-count"),
     qcard: $("#qcard"),
     qTag: $("#q-tag"),
@@ -217,26 +216,56 @@
 
   function showIntro() {
     setView("intro");
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(buildStamp);
   }
 
-  // מי שנכנס.ה מקישור ששותף רואה את התוצאה של מי ששלח.ה
+  // מי שנכנס.ה מקישור ששותף רואה את התוצאה של מי ששלח.ה, ומוזמן.ת לעקוף אותה
   function setupChallenge(params) {
     const raw = params.get("s");
     if (raw === null || !/^\d{1,3}$/.test(raw)) return;
     const pct = clampPct(raw);
-    const pctEl = document.createElement("b");
-    pctEl.textContent = `${pct}%`;
-    el.challenge.replaceChildren("מי ששלח.ה לך את הקישור קיבל.ה ", pctEl, ` — ״${tierFor(pct).title}״. עכשיו תורך.`);
+    const badge = document.createElement("span");
+    badge.className = "challenge__pct";
+    badge.textContent = `${pct}%`;
+    const tier = document.createElement("b");
+    tier.textContent = `״${tierFor(pct).title}״`;
+    const turn = document.createElement("span");
+    turn.className = "challenge__turn";
+    turn.textContent = "עכשיו תורך לעקוף.";
+    const text = document.createElement("span");
+    text.className = "challenge__text";
+    text.append("זה מה שיצא למי ששלח.ה לך את הקישור: ", tier, ".", turn);
+    el.challenge.replaceChildren(badge, text);
     el.challenge.hidden = false;
+    el.start.querySelector("span").textContent = "יאללה, מודדים ומשווים";
   }
 
+  // כל אות בטבעת מקבלת זווית לפי הרוחב שלה, אחרת אותיות צרות (י, ו) משאירות חורים.
+  // המדידה דורשת שהחותמת תוצג והגופן ייטען, ולכן היא רצה בכניסה למסך הפתיחה.
   function buildStamp() {
-    const chars = Array.from("מדע מדויק ✦ בערך ✦ ".repeat(2));
-    const step = 360 / chars.length;
+    const ring = el.stampRing;
+    if (ring.dataset.built || !ring.getBoundingClientRect().width) return;
+    const chars = Array.from("מדע מדויק ✦ בערך ✦ ".repeat(2), (ch) => (ch === " " ? "\u00a0" : ch));
+    const widths = chars.map((ch) => {
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.textContent = ch;
+      ring.append(t);
+      const w = t.getComputedTextLength();
+      t.remove();
+      return ch === "\u00a0" ? w * 1.15 : w;
+    });
+    const sum = widths.reduce((a, b) => a + b, 0);
+    if (!sum) return;
+    let acc = 0;
     // נגד כיוון השעון, כדי שהטקסט ייקרא מימין לשמאל
-    el.stampRing.innerHTML = chars
-      .map((ch, k) => `<text x="60" y="17" text-anchor="middle" transform="rotate(${(-k * step).toFixed(2)} 60 60)">${ch}</text>`)
+    ring.innerHTML = chars
+      .map((ch, k) => {
+        const angle = -((acc + widths[k] / 2) / sum) * 360;
+        acc += widths[k];
+        return `<text x="60" y="17.5" text-anchor="middle" transform="rotate(${angle.toFixed(2)} 60 60)">${ch}</text>`;
+      })
       .join("");
+    ring.dataset.built = "1";
   }
 
   /* ---------------- שאלות ---------------- */
@@ -248,7 +277,10 @@
     setView("quiz");
     document.body.dataset.accent = ACCENTS[i % ACCENTS.length];
 
-    el.progressFill.style.width = `${((i + 1) / total) * 100}%`;
+    el.progress.querySelectorAll(".progress__seg").forEach((seg, k) => {
+      seg.classList.toggle("is-done", k < i);
+      seg.classList.toggle("is-current", k === i);
+    });
     el.progress.setAttribute("aria-valuenow", String(i + 1));
     el.progress.setAttribute("aria-valuetext", `שאלה ${i + 1} מתוך ${total}`);
     el.progressCount.textContent = `${i + 1}/${total}`;
@@ -330,7 +362,8 @@
 
   function onKey(e) {
     if (state.view !== "quiz" || e.altKey || e.ctrlKey || e.metaKey) return;
-    const n = Number(e.key);
+    // מספרים (1, 2, 3…) או האותיות שעל הכפתורים (א, ב, ג…) במקלדת עברית
+    const n = LETTERS.includes(e.key) ? LETTERS.indexOf(e.key) + 1 : Number(e.key);
     const buttons = el.answers.querySelectorAll(".answer");
     if (n >= 1 && n <= buttons.length) {
       e.preventDefault();
@@ -354,7 +387,9 @@
   }
 
   function buildGauge(svg, { labels }) {
-    const housing = "M10 180A170 170 0 0 1 350 180V200Q350 208 342 208H18Q10 208 10 200Z";
+    // עם תוויות הבית ארוך יותר: "שמאל · יחידות · ימין" בשורה אחת מתחת לציר, מחוץ להישג המחט
+    const bottom = labels ? 221 : 208;
+    const housing = `M10 180A170 170 0 0 1 350 180V${bottom - 8}Q350 ${bottom} 342 ${bottom}H18Q10 ${bottom} 10 ${bottom - 8}Z`;
     const segments = tiers
       .map((t, k) => {
         const next = tiers[k + 1] ? tiers[k + 1].from : 100;
@@ -371,12 +406,12 @@
     }
 
     const text = labels
-      ? `<text class="g-end" x="314" y="201" text-anchor="middle">ימין</text>
-         <text class="g-end" x="46" y="201" text-anchor="middle">שמאל</text>
-         <text class="g-unit" x="180" y="142" text-anchor="middle">יחידות: 0מאל</text>`
+      ? `<text class="g-end" x="314" y="213" text-anchor="middle">ימין</text>
+         <text class="g-end" x="46" y="213" text-anchor="middle">שמאל</text>
+         <text class="g-unit" x="180" y="213" text-anchor="middle">יחידות: 0מאל</text>`
       : "";
 
-    svg.setAttribute("viewBox", "-4 4 368 214");
+    svg.setAttribute("viewBox", `-4 4 368 ${bottom + 6}`);
     svg.innerHTML = `
       <path class="g-shadow" d="${housing}" transform="translate(-6 6)"/>
       <path class="g-housing" d="${housing}"/>
@@ -636,7 +671,14 @@
   function init() {
     el.qCount.textContent = total;
     el.progress.setAttribute("aria-valuemax", String(total));
-    buildStamp();
+    el.progress.replaceChildren(
+      ...questions.map((_, k) => {
+        const seg = document.createElement("span");
+        seg.className = "progress__seg";
+        seg.style.setProperty("--c", PALETTE[k % PALETTE.length]);
+        return seg;
+      })
+    );
     resultNeedle = buildGauge(el.resultGauge, { labels: true });
     loadingNeedle = buildGauge(el.loadingGauge, { labels: false });
 

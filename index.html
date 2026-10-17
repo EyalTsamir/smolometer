@@ -60,15 +60,15 @@
 
       <div class="intro__art">
         <div class="collage">
-          <figure class="card card--aloni" style="--c: var(--mint); --r: 7deg; --d: 250ms; --bob: 5.6s">
+          <figure class="card card--aloni" style="--c: var(--mint); --r: 7deg; --d: 250ms">
             <div class="card__photo"><img src="images/aloni.jpg" alt="שולמית אלוני" width="480" height="642"></div>
             <figcaption class="card__name">שולמית אלוני</figcaption>
           </figure>
-          <figure class="card card--peres" style="--c: var(--sun); --r: -8deg; --d: 370ms; --bob: 6.3s">
+          <figure class="card card--peres" style="--c: var(--sun); --r: -8deg; --d: 370ms">
             <div class="card__photo"><img src="images/peres.jpg" alt="שמעון פרס" width="600" height="800"></div>
             <figcaption class="card__name">שמעון פרס</figcaption>
           </figure>
-          <figure class="card card--rabin" style="--c: var(--coral); --r: -2deg; --d: 490ms; --bob: 5.1s">
+          <figure class="card card--rabin" style="--c: var(--coral); --r: -2deg; --d: 490ms">
             <div class="card__photo"><img src="images/rabin.jpg" alt="יצחק רבין" width="540" height="720"></div>
             <figcaption class="card__name">יצחק רבין</figcaption>
           </figure>
@@ -118,11 +118,9 @@
       <div class="quiz__bar">
         <button class="back-btn" id="back-btn" type="button">
           <svg class="btn__icon" aria-hidden="true"><use href="#i-arrow-right"/></svg>
-          <span>חזרה</span>
+          <span class="sr-only">חזרה</span>
         </button>
-        <div class="progress" id="progress" role="progressbar" aria-label="התקדמות בחידון" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1">
-          <span class="progress__fill" id="progress-fill"></span>
-        </div>
+        <div class="progress" id="progress" role="progressbar" aria-label="התקדמות בחידון" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1"></div>
         <span class="progress__count" id="progress-count" aria-hidden="true">1/9</span>
       </div>
 
@@ -133,7 +131,7 @@
         <ol class="answers" id="answers"></ol>
       </article>
 
-      <p class="quiz__hint">אפשר לענות גם עם מקשי המספרים</p>
+      <p class="quiz__hint">אפשר לענות גם מהמקלדת: באותיות (א, ב, ג…) או במספרים</p>
     </section>
 
     <!-- ============ מדידה ============ -->
@@ -159,7 +157,7 @@
       </article>
 
       <div class="share">
-        <p class="share__label">שתפו ותראו מי יותר</p>
+        <p class="share__label">שלחו לקבוצה ותראו מי יותר 0מאלני.ת</p>
         <div class="share__row">
           <a class="btn btn--wa" id="share-wa" href="#" target="_blank" rel="noopener">
             <svg class="btn__icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
