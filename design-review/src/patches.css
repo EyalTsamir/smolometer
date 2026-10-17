@@ -1,0 +1,254 @@
+/* ============ שכבת ההצעות — כל הצעה מופעלת ע"י מחלקה על <html> ============ */
+
+/* G1 — גופן כתב־יד */
+html.p-hand-bold .callout,
+html.p-hand-bold .loading__line,
+html.p-hand-bold .share__label { -webkit-text-stroke: .5px currentColor; letter-spacing: .01em; }
+html.p-hand-bold .callout { font-size: clamp(1.55rem, 3.9vw, 1.95rem); }
+html.p-hand-bold .loading__line { color: var(--ink); font-size: clamp(1.7rem, 5.2vw, 2rem); }
+html.p-hand-bold .share__label { font-size: 1.95rem; }
+
+html.p-hand-gveret { --font-hand: "Gveret Levin", "Fredoka", "Rubik", sans-serif; }
+html.p-hand-gveret .callout { font-size: clamp(1.02rem, 2.9vw, 1.3rem); font-weight: 400; }
+html.p-hand-gveret .loading__line { font-size: clamp(1.12rem, 3.7vw, 1.4rem); font-weight: 400; line-height: 1.45; }
+html.p-hand-gveret .share__label { font-size: 1.32rem; font-weight: 400; }
+
+html.p-hand-playpen { --font-hand: "Playpen Sans Hebrew", "Fredoka", "Rubik", sans-serif; }
+html.p-hand-playpen .callout { font-size: clamp(.98rem, 2.8vw, 1.22rem); font-weight: 600; }
+html.p-hand-playpen .loading__line { font-size: clamp(1.08rem, 3.6vw, 1.32rem); font-weight: 500; line-height: 1.45; }
+html.p-hand-playpen .share__label { font-size: 1.25rem; font-weight: 600; }
+
+/* G2 — ה־0 כסמל שלום גם בטקסט */
+.zero-glyph { display: inline-block; width: .74em; height: .74em; margin-inline: .03em; vertical-align: -.06em; }
+.zero-glyph svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.zero-glyph circle { fill: var(--coral); stroke: var(--ink); stroke-width: 4.5; }
+.zero-glyph path { fill: none; stroke: var(--ink); stroke-width: 4.5; stroke-linecap: round; }
+.rcard__title .zero-glyph circle { fill: var(--paper-2); }
+
+/* G3 — תנועה רגועה: לולאות אינסופיות נעצרות אחרי הכניסה */
+html.p-calm .card { animation: card-in .9s var(--ease-spring) var(--d) backwards; }
+html.p-calm .doodle--dove { animation: pop-in .8s var(--ease-spring) 1s backwards, fly 7s ease-in-out 1.8s 1; }
+html.p-calm .doodle--spark { animation: pop-in .6s var(--ease-spring) var(--sd) backwards, twinkle 2.8s ease-in-out calc(var(--sd) + .6s) 2; }
+html.p-calm .pill__dot { animation-iteration-count: 4; }
+html.p-calm .stamp__ring { animation-duration: 70s; }
+
+/* G4 — גרעיניות מתחת לתוכן */
+html.p-grain-under .grain { z-index: 0; }
+html.p-grain-under .topbar,
+html.p-grain-under .app,
+html.p-grain-under .site-footer { position: relative; z-index: 1; }
+
+/* I1 — פתיחה מהודקת (מובייל) */
+@media (max-width: 899px) {
+  html.p-hero-compact .intro { padding-block: 16px 8px; gap: 12px; }
+  html.p-hero-compact .pill { margin-bottom: 12px; }
+  html.p-hero-compact .collage { aspect-ratio: 1 / .8; margin-top: 2px; }
+  html.p-hero-compact .card--aloni { top: 3%; }
+  html.p-hero-compact .card--peres { top: 7%; }
+  html.p-hero-compact .card--rabin { top: 16%; }
+  html.p-hero-compact .callout { bottom: 5%; }
+  html.p-hero-compact .doodle--spark.s1 { top: 49%; }
+  html.p-hero-compact .doodle--spark.s3 { bottom: 9%; left: 8%; }
+  html.p-hero-compact .intro__body { gap: 12px; }
+}
+
+/* I2 — כפתור התחלה צף (מובייל) */
+@media (max-width: 899px) {
+  html.p-cta-sticky body[data-view="intro"] #start-btn {
+    position: fixed;
+    z-index: 50;
+    inset-inline: var(--gutter);
+    bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+  html.p-cta-sticky body[data-view="intro"] .intro { padding-bottom: 96px; }
+  html.p-cta-sticky body[data-view="intro"] .intro::after {
+    content: "";
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 49;
+    height: calc(104px + env(safe-area-inset-bottom));
+    pointer-events: none;
+    background: linear-gradient(to top, var(--paper) 55%, rgba(255, 244, 228, 0));
+  }
+}
+
+/* I3 — כפתור לפני הקולאז׳ (מובייל) */
+@media (max-width: 899px) {
+  html.p-cta-first .intro { grid-template-areas: "head" "body" "art"; }
+  html.p-cta-first .intro__art { margin-top: -6px; }
+}
+
+/* I4 — תוויות השמות לא נחתכות */
+html.p-labels .card--peres .card__name { left: 40%; }
+html.p-labels .card--aloni .card__name { left: 59%; }
+
+/* I5 — חותמת קריאה */
+html.p-stamp .stamp__ring text { font-size: 13.4px; font-weight: 600; }
+
+/* I6 — באנר אתגר ככרטיס יריבות */
+html.p-challenge-card .challenge {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 14px;
+  rotate: -1deg;
+}
+html.p-challenge-card .challenge:not([hidden]) ~ .pill { display: none; }
+@media (max-width: 899px) {
+  html.p-challenge-card .intro:has(.challenge:not([hidden])) .collage { width: 84%; }
+  html.p-challenge-card .intro:has(.challenge:not([hidden])) .callout { right: -4%; bottom: -2%; }
+}
+.ch-pct {
+  display: grid;
+  place-items: center;
+  min-width: 3.3em;
+  padding: .32em .3em .26em;
+  font: 700 1.9rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  background: var(--paper-2);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  rotate: 3deg;
+}
+.ch-text { font: 500 .98rem/1.38 var(--font-body); }
+.ch-text b { font-family: var(--font-display); font-weight: 700; }
+.ch-text .ch-turn { display: block; margin-top: 2px; font: 700 1.08rem/1.3 var(--font-display); }
+
+/* I7 — כפתור ברוחב סביר בטאבלט */
+@media (min-width: 560px) and (max-width: 899px) {
+  html.p-tablet .intro__body { align-items: flex-start; }
+  html.p-tablet #start-btn { width: min(100%, 440px); }
+}
+
+/* Q1 — כותרת שאלון קומפקטית (מובייל) */
+@media (max-width: 899px) {
+  html.p-header-compact .topbar { padding-top: 12px; }
+  html.p-header-compact .logo--mini { font-size: 1.15rem; }
+  html.p-header-compact .quiz,
+  html.p-header-compact .loading { padding-top: 10px; }
+  html.p-header-compact .result { padding-top: 26px; }
+  html.p-header-compact .quiz__bar { margin-bottom: 28px; }
+}
+
+/* Q2 — כפתור חזרה שקט, 44px */
+html.p-back-quiet .back-btn {
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  background: transparent;
+  border-width: 2px;
+  box-shadow: none;
+}
+html.p-back-quiet .back-btn span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+html.p-back-quiet .back-btn .btn__icon { width: 1.3em; height: 1.3em; }
+html.p-back-quiet .back-btn:active { translate: none; background: var(--paper-2); }
+
+/* Q3 — סרגל התקדמות מקוטע */
+html.p-progress-seg .progress {
+  display: flex;
+  gap: 4px;
+  height: 14px;
+  overflow: visible;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+html.p-progress-seg .progress__fill { display: none; }
+.pseg {
+  flex: 1;
+  min-width: 0;
+  background: var(--paper-2);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  transition: background-color .4s var(--ease-out), scale .4s var(--ease-spring);
+}
+.pseg.is-done { background: var(--c); }
+.pseg.is-current {
+  background-color: var(--accent);
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, .5) 0 4px, transparent 4px 8px);
+  scale: 1 1.25;
+}
+
+/* Q4 — תשובות מהודקות (מובייל) */
+@media (max-width: 899px) {
+  html.p-answers-compact .qcard { padding-top: 38px; }
+  html.p-answers-compact .answers { gap: 10px; margin-top: 20px; }
+  html.p-answers-compact .answer { min-height: 54px; padding: 9px 12px; gap: 12px; border-radius: 16px; }
+  html.p-answers-compact .answer__letter { width: 2.05rem; height: 2.05rem; font-size: 1rem; }
+}
+
+/* Q5 — תשובות שלא נבחרו נשארות קריאות */
+html.p-fade-soft .answers.is-locked .answer:not(.is-selected) { opacity: .62; }
+
+/* R1 — תווית היחידות יוצאת ממסלול המחט (גאומטריה ב־JS) */
+
+/* R2 — תוצאה קומפקטית (מובייל) */
+@media (max-width: 899px) {
+  html.p-result-compact .result { gap: 20px; padding-top: 28px; }
+  html.p-result-compact.p-header-compact .result { padding-top: 22px; }
+  html.p-result-compact .rcard { padding: 38px 16px 22px; }
+  html.p-result-compact .gauge { width: min(100%, 290px); }
+  html.p-result-compact .rcard__label { margin-top: 8px; font-size: .95rem; }
+  html.p-result-compact .rcard__pct { font-size: clamp(3.4rem, 14vw, 4.4rem); }
+  html.p-result-compact .rcard__verdict { margin-top: 10px; }
+  html.p-result-compact .rcard__title { font-size: clamp(1.4rem, 5.4vw, 2rem); }
+  html.p-result-compact .rcard__text { margin-top: 14px; font-size: 1.02rem; line-height: 1.5; }
+  html.p-result-compact .share__label { margin-bottom: 8px; }
+}
+
+/* R3 — פריסת שיתוף למובייל */
+@media (max-width: 899px) {
+  html.p-share-stack .share__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  html.p-share-stack .share__row .btn { width: 100%; padding-inline: .8em; }
+  html.p-share-stack #share-wa { grid-column: 1 / -1; min-height: 58px; font-size: 1.2rem; }
+  html.p-share-stack .share__row:has(#share-native[hidden]) #share-copy { grid-column: 1 / -1; }
+
+  html.p-share-sticky body[data-view="result"] .share {
+    position: fixed;
+    z-index: 50;
+    inset: auto 0 0;
+    padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+    background: var(--paper-2);
+    border-top: var(--bw) solid var(--ink);
+    box-shadow: 0 -6px 0 rgba(36, 27, 59, .08);
+  }
+  html.p-share-sticky body[data-view="result"] .share__label { display: none; }
+  html.p-share-sticky body[data-view="result"] .result { padding-bottom: 104px; }
+  html.p-share-sticky .share__row { flex-wrap: nowrap; gap: 10px; }
+  html.p-share-sticky .share__row .btn { min-height: 52px; box-shadow: var(--shadow-sm); }
+  html.p-share-sticky #share-wa { flex: 1; font-size: 1.1rem; }
+  html.p-share-sticky #share-copy,
+  html.p-share-sticky #share-native { flex: none; width: 52px; padding: 0; }
+  html.p-share-sticky #share-copy span,
+  html.p-share-sticky #share-native span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* D1 — דסקטופ: קולאז׳ גדול יותר, פחות חלל מת */
+@media (min-width: 900px) {
+  html.p-desktop .intro {
+    width: min(1240px, 100% - 2 * var(--gutter));
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    column-gap: clamp(24px, 4vw, 56px);
+  }
+  html.p-desktop .collage { width: min(100%, 720px); }
+  html.p-desktop .lede { max-width: 30ch; }
+}
