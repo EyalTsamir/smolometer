@@ -1,0 +1,1182 @@
+<title>מעבדת העיצוב של ה0מאלנומטר</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Rubik:wght@400;500;600&display=swap">
+<style>
+/* Layout: מעבדה — רשימת הצעות בצד ההתחלה ובמה דביקה עם מסגרות מכשיר; במובייל הבמה דביקה למעלה והרשימה גוללת מתחתיה */
+:root {
+  --bg: #F1EFF6;
+  --surface: #FFFFFF;
+  --surface-2: #F7F5FB;
+  --ink: #231C38;
+  --muted: #5F5878;
+  --line: #DAD5E5;
+  --accent: #FF7A5C;
+  --accent-soft: #FFE7DF;
+  --on-accent: #231C38;
+  --focus: #6A4DF0;
+  --site-paper: #FFF4E4;
+  --ok: #17885B;
+  --bad: #CF3434;
+  --sev-critical: #E03C3C;
+  --sev-high: #EE8A22;
+  --sev-medium: #D9AE12;
+  --sev-low: #8F88A6;
+  --sev-alt: #3E8CE0;
+  --sev-taste: #A06BF0;
+  --font-display: "Fredoka", "Rubik", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Rubik", "Segoe UI", system-ui, sans-serif;
+  --radius: 14px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15111F; --surface: #211B2F; --surface-2: #1A1527; --ink: #EFEAF8; --muted: #ADA5C4; --line: #3A3150;
+    --accent: #FF8B70; --accent-soft: #3B2523; --on-accent: #1A1326; --focus: #A693FF;
+    --ok: #3CC48D; --bad: #FF6B6B; --sev-low: #9C95B4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15111F; --surface: #211B2F; --surface-2: #1A1527; --ink: #EFEAF8; --muted: #ADA5C4; --line: #3A3150;
+  --accent: #FF8B70; --accent-soft: #3B2523; --on-accent: #1A1326; --focus: #A693FF;
+  --ok: #3CC48D; --bad: #FF6B6B; --sev-low: #9C95B4;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--font-body); margin: 0; }
+.lab-root { padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: 0 24px; }
+h1, h2, h3, h4, p, figure, dl, dd, ul, ol { margin: 0; }
+button, select, input, textarea { font: inherit; color: inherit; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+body.no-scroll { overflow: hidden; }
+
+/* ---------- כותרת ---------- */
+.top { max-width: 1480px; margin: 0 auto; padding-block: 18px 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.brand svg { flex: none; width: 40px; height: 40px; }
+.brand svg circle { fill: var(--accent); stroke: var(--ink); stroke-width: 4.5; }
+.brand svg path { fill: none; stroke: var(--ink); stroke-width: 4.5; stroke-linecap: round; }
+.brand h1 { font: 700 clamp(1.35rem, 4.4vw, 1.85rem)/1.1 var(--font-display); text-wrap: balance; }
+.brand p { margin-top: 2px; font-size: .9rem; color: var(--muted); }
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; }
+.tabs button { min-height: 40px; padding: 0 16px; font: 600 .95rem/1 var(--font-display); background: none; border: 0; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tabs .count { min-width: 1.6em; padding: 2px 6px; font-size: .78rem; text-align: center; background: var(--accent); color: var(--on-accent); border-radius: 999px; }
+
+/* ---------- מעבדה ---------- */
+.lab { max-width: 1480px; margin: 0 auto; }
+.stage {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  height: min(60svh, 640px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: calc(-1 * var(--gutter-l));
+  margin-right: calc(-1 * var(--gutter-r));
+  padding: 8px var(--gutter-r) 8px var(--gutter-l);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.stage-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+.field { position: relative; display: flex; min-width: 0; }
+.field select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px 0 30px;
+  font-size: .9rem;
+  text-overflow: ellipsis;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  appearance: none;
+  cursor: pointer;
+}
+.field::after { content: ""; position: absolute; left: 13px; top: 50%; width: 7px; height: 7px; border: solid var(--muted); border-width: 0 0 2px 2px; translate: 0 -70%; rotate: -45deg; pointer-events: none; }
+.seg { display: flex; padding: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.seg button { min-height: 32px; padding: 0 10px; font: 600 .85rem/1 var(--font-display); background: none; border: 0; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.icon-btn { min-width: 38px; min-height: 38px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.stage-row2 { display: flex; gap: 6px; }
+.stage-row2 .field { flex: 1; }
+
+.frames { position: relative; flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-start; gap: 12px; }
+.frame { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+.frame figcaption { display: flex; align-items: center; gap: 6px; font: 600 .8rem/1.2 var(--font-display); color: var(--muted); white-space: nowrap; }
+.frame figcaption b { color: var(--ink); }
+.frame .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sev-low); }
+.frame[data-side="after"] .dot { background: var(--accent); }
+.device { position: relative; overflow: hidden; background: var(--site-paper); border-radius: 16px; box-shadow: 0 0 0 2px var(--ink); }
+.device iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: var(--site-paper); }
+.stage-note { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-height: 22px; font-size: .78rem; color: var(--muted); }
+.stage-note .pid-chip { padding: 1px 7px; font: 600 .74rem/1.5 var(--font-display); color: var(--ink); background: var(--accent-soft); border-radius: 999px; }
+
+.stage.is-collapsed { height: auto; }
+.stage.is-collapsed .frames, .stage.is-collapsed .stage-note { display: none; }
+@media (max-width: 1099px) {
+  .panel .prop, .panel .group, .panel .presets { scroll-margin-top: calc(min(60svh, 640px) + 12px); scroll-margin-bottom: 64px; }
+  .stage.is-collapsed ~ .panel .prop, .stage.is-collapsed ~ .panel .group { scroll-margin-top: 120px; }
+}
+.stage.is-expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  height: 100%;
+  margin: 0;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--gutter-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+  border: 0;
+}
+
+/* ---------- רשימת ההצעות ---------- */
+.panel { padding-block: 16px 0; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.intro-note { padding: 12px 14px; font-size: .92rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.intro-note b { font-family: var(--font-display); }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.presets button, .chip-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  font: 600 .88rem/1 var(--font-display);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.presets button.is-on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.jump-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.jump-row a { flex: none; padding: 6px 12px; font: 600 .82rem/1 var(--font-display); text-decoration: none; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: .78rem; color: var(--muted); }
+
+.group { display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 12px; }
+.group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 10px; }
+.group-head h2 { font: 700 1.2rem/1.2 var(--font-display); }
+.group-head span { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+
+.prop { padding: 12px 14px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); transition: border-color .2s, box-shadow .2s; scroll-margin-top: 12px; }
+.prop.is-on { border-color: var(--ink); box-shadow: -3px 3px 0 var(--ink); }
+.prop.is-flash { box-shadow: 0 0 0 3px var(--focus); }
+.prop-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.prop-title { display: block; cursor: pointer; }
+.prop-title h3 { font: 600 1.02rem/1.3 var(--font-display); }
+.pid { display: inline-block; min-width: 2.2em; margin-inline-end: 4px; padding: 0 5px; font: 700 .78rem/1.6 var(--font-display); text-align: center; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; vertical-align: 2px; }
+.prop-sum { margin-top: 4px; font-size: .9rem; color: var(--muted); }
+.prop-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; padding-inline-start: 58px; }
+.sev { display: inline-flex; align-items: center; gap: 5px; font: 600 .78rem/1 var(--font-display); }
+.sev::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.sev[data-sev="critical"] { --c: var(--sev-critical); }
+.sev[data-sev="high"] { --c: var(--sev-high); }
+.sev[data-sev="medium"] { --c: var(--sev-medium); }
+.sev[data-sev="low"] { --c: var(--sev-low); }
+.sev[data-sev="alt"] { --c: var(--sev-alt); }
+.sev[data-sev="taste"] { --c: var(--sev-taste); }
+.rec-tag { padding: 2px 8px; font: 600 .74rem/1.4 var(--font-display); background: var(--accent-soft); border-radius: 999px; }
+.link-btn { min-height: 32px; padding: 0 4px; font: 600 .84rem/1 var(--font-display); color: var(--ink); background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.prop-more { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.prop-more dl { display: grid; gap: 8px; font-size: .92rem; }
+.prop-more dt { font: 600 .8rem/1.2 var(--font-display); color: var(--muted); }
+.prop-more dd { margin: 0; }
+
+.switch { position: relative; flex: none; width: 46px; height: 28px; margin-top: 1px; cursor: pointer; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.switch .track { position: absolute; inset: 0; background: var(--surface-2); border: 2px solid var(--muted); border-radius: 999px; transition: background-color .2s, border-color .2s; }
+.switch .track::after { content: ""; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: var(--muted); border-radius: 50%; transition: translate .2s, background-color .2s; }
+.switch input:checked + .track { background: var(--accent); border-color: var(--ink); }
+.switch input:checked + .track::after { translate: -18px 0; background: var(--ink); }
+.switch input:focus-visible + .track { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.choices { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.choices label { position: relative; display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; font: 600 .84rem/1.2 var(--font-display); background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+.choices input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.choices label:has(input:checked) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.choices label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.choice-badge { width: 46px; height: 28px; display: grid; place-items: center; font: 700 .7rem/1 var(--font-display); color: var(--muted); border: 2px dashed var(--line); border-radius: 999px; }
+.prop.is-on .choice-badge { color: var(--on-accent); background: var(--accent); border: 2px solid var(--ink); }
+
+.panel-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  margin-top: 6px;
+  padding: 7px 12px calc(7px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.panel-foot b { font-family: var(--font-display); }
+.panel-foot button { min-height: 36px; padding: 0 16px; font: 600 .92rem/1 var(--font-display); color: var(--on-accent); background: var(--accent); border: 0; border-radius: 999px; cursor: pointer; }
+
+@media (min-width: 700px) {
+  .stage-bar { grid-template-columns: minmax(0, 1.3fr) auto minmax(0, 1fr) auto auto; }
+  .stage-row2 { display: contents; }
+}
+@media (min-width: 1100px) {
+  .lab { display: grid; grid-template-columns: minmax(380px, 460px) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .panel { grid-column: 1; grid-row: 1; }
+  .stage { grid-column: 2; grid-row: 1; top: 12px; height: calc(100svh - 24px); margin: 0; padding: 16px 0 8px; border: 0; }
+  .jump-row { flex-wrap: wrap; overflow: visible; }
+  .panel-foot { border-radius: var(--radius); margin-bottom: 12px; }
+}
+
+/* ---------- סקירה ---------- */
+.doc { max-width: 76ch; margin: 8px auto 0; display: flex; flex-direction: column; gap: 32px; }
+.doc section { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
+.doc h2 { font: 700 clamp(1.35rem, 4vw, 1.65rem)/1.2 var(--font-display); text-wrap: balance; }
+.doc h3 { font: 600 1.12rem/1.3 var(--font-display); margin-top: 6px; }
+.doc p, .doc li { font-size: 1.02rem; line-height: 1.7; }
+.doc ul, .doc ol { padding-inline-start: 1.3em; display: grid; gap: 6px; }
+.lead { font-size: 1.12rem !important; }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.status { padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.status h4 { font: 600 .95rem/1.2 var(--font-display); }
+.status p { margin-top: 4px; font-size: .9rem !important; line-height: 1.5 !important; color: var(--muted); }
+.pill-state { display: inline-block; margin-top: 8px; padding: 2px 9px; font: 600 .76rem/1.5 var(--font-display); border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+.pill-state[data-s="good"] { color: var(--ok); border-color: currentColor; }
+.pill-state[data-s="fix"] { color: var(--bad); border-color: currentColor; }
+.pill-state[data-s="mid"] { color: var(--sev-high); border-color: currentColor; }
+.finding { padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: grid; gap: 6px; }
+.finding h4 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 600 1rem/1.35 var(--font-display); }
+.finding p { font-size: .96rem !important; line-height: 1.6 !important; }
+.finding .refs { display: flex; flex-wrap: wrap; gap: 6px; }
+.ref-btn { min-height: 30px; padding: 0 10px; font: 600 .8rem/1 var(--font-display); background: var(--accent-soft); color: var(--ink); border: 0; border-radius: 999px; cursor: pointer; }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 12px; text-align: start; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font: 600 .8rem/1.3 var(--font-display); color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+.v-bad { color: var(--bad); font-weight: 600; }
+.v-ok { color: var(--ok); font-weight: 600; }
+.small { font-size: .88rem !important; color: var(--muted); }
+code { font-size: .9em; padding: 0 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; direction: ltr; unicode-bidi: isolate; }
+
+/* ---------- סיכום ---------- */
+.summary { max-width: 980px; margin: 8px auto 0; display: flex; flex-direction: column; gap: 18px; }
+.sum-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.sum-box { padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sum-box h2 { font: 700 1.15rem/1.2 var(--font-display); }
+.sum-box ul { padding: 0; list-style: none; display: grid; gap: 6px; }
+.sum-box li { display: flex; gap: 8px; align-items: baseline; font-size: .95rem; }
+.export textarea { width: 100%; min-height: 220px; padding: 12px; font-size: .9rem; line-height: 1.6; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; resize: vertical; }
+.export-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn-main { min-height: 44px; padding: 0 20px; font: 600 1rem/1 var(--font-display); color: var(--on-accent); background: var(--accent); border: 2px solid var(--ink); border-radius: 12px; box-shadow: -3px 3px 0 var(--ink); cursor: pointer; }
+.btn-main:active { translate: -3px 3px; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+<!--HEAD-END-->
+<div class="lab-root" dir="rtl" lang="he">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"/><path d="M24 3v42M24 24 9.2 38.8M24 24l14.8 14.8"/></svg>
+      <div>
+        <h1>מעבדת העיצוב של ה0מאלנומטר</h1>
+        <p>סקירת UI/UX עם דגש על מובייל. מדליקים הצעה ורואים אותה על האתר האמיתי.</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="חלקי המסמך">
+      <button role="tab" id="tab-btn-lab" aria-controls="tab-lab" aria-selected="true" data-tab="lab">מעבדה</button>
+      <button role="tab" id="tab-btn-review" aria-controls="tab-review" aria-selected="false" data-tab="review">הסקירה</button>
+      <button role="tab" id="tab-btn-summary" aria-controls="tab-summary" aria-selected="false" data-tab="summary">סיכום <span class="count" id="tab-count">0</span></button>
+    </nav>
+  </header>
+
+  <!-- ================= מעבדה ================= -->
+  <section class="lab" id="tab-lab" role="tabpanel" aria-labelledby="tab-btn-lab">
+    <div class="stage" id="stage">
+      <div class="stage-bar">
+        <label class="field"><span class="sr-only">מסך</span><select id="screen-select"></select></label>
+        <div class="seg" role="group" aria-label="מה להציג" id="mode-seg">
+          <button type="button" data-mode="before" aria-pressed="false">לפני</button>
+          <button type="button" data-mode="after" aria-pressed="true">אחרי</button>
+          <button type="button" data-mode="both" aria-pressed="false">שניהם</button>
+        </div>
+        <div class="stage-row2">
+          <label class="field"><span class="sr-only">מכשיר</span><select id="device-select"></select></label>
+          <button type="button" class="icon-btn" id="collapse-btn" aria-label="הסתרת התצוגה" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="expand-btn" aria-label="הגדלת התצוגה" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="frames" id="frames">
+        <figure class="frame" data-side="before">
+          <figcaption><span class="dot"></span>לפני: האתר כמו שהוא היום</figcaption>
+          <div class="device"><iframe title="האתר המקורי" loading="eager"></iframe></div>
+        </figure>
+        <figure class="frame" data-side="after">
+          <figcaption><span class="dot"></span>אחרי: <b id="after-count">0</b>&nbsp;הצעות דלוקות</figcaption>
+          <div class="device"><iframe title="האתר עם ההצעות שנבחרו" loading="eager"></iframe></div>
+        </figure>
+      </div>
+      <p class="stage-note" id="stage-note"></p>
+    </div>
+
+    <div class="panel" id="panel">
+      <p class="intro-note"><b>איך משתמשים:</b> כל מתג מדליק הצעה אחת, והתצוגה ״אחרי״ מתעדכנת מיד. ״לפני״ הוא האתר כמו שהוא היום. אפשר לגלול ולהקיש בתוך הטלפון, החידון עובד באמת. גובה המסגרת הוא השטח שבאמת רואים בלי לגלול. אפשר לבחור מכשיר אחר למעלה. כשמסיימים, ״סיכום״ מרכז את מה שאישרת.</p>
+      <div class="presets" id="presets" role="group" aria-label="בחירות מוכנות">
+        <button type="button" data-preset="rec">ההמלצה שלי</button>
+        <button type="button" data-preset="critical">רק קריטי וגבוה</button>
+        <button type="button" data-preset="none">כלום (המקור)</button>
+        <button type="button" data-preset="all">הכול</button>
+      </div>
+      <div class="legend" aria-label="מקרא חומרה">
+        <span class="sev" data-sev="critical">קריטי</span><span class="sev" data-sev="high">גבוה</span><span class="sev" data-sev="medium">בינוני</span><span class="sev" data-sev="low">נמוך</span><span class="sev" data-sev="alt">חלופה</span><span class="sev" data-sev="taste">טעם אישי</span>
+      </div>
+      <nav class="jump-row" id="jump-row" aria-label="קפיצה לקבוצה"></nav>
+      <div id="groups"></div>
+      <div class="panel-foot">
+        <span><b id="foot-count">0</b> הצעות דלוקות</span>
+        <button type="button" data-goto-tab="summary">לסיכום ולאישור</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= סקירה ================= -->
+  <section id="tab-review" role="tabpanel" aria-labelledby="tab-btn-review" hidden>
+    <article class="doc">
+
+      <section>
+        <h2>בשורה התחתונה</h2>
+        <p class="lead">לאתר יש זהות חזקה ומקורית: מדבקות עם קו דיו עבה, צללים שנופלים שמאלה־למטה כי באתר מימין לשמאל האור מגיע מימין, דיוקנאות בדואוטון, וסמל שלום שמחליף את ה־ש׳. גם הקוד מוקפד יותר מרוב האתרים מהסוג הזה: ניווט עם היסטוריה, כיבוד של הגדרת ״הפחתת תנועה״, פוקוס נראה וניגודיות גבוהה.</p>
+        <p>הבעיות מרוכזות כמעט כולן בכלכלת המסך במובייל. בשני הרגעים שקובעים אם החידון יתפשט, הכניסה והשיתוף, הפעולה הראשית לא נראית בלי גלילה במכשירים נפוצים. מסביב לזה יש כמה באגים קטנים של ליטוש, שבולטים דווקא כי כל השאר כל כך מוקפד.</p>
+        <div class="status-grid">
+          <div class="status"><h4>זהות ויזואלית</h4><p>מקורית, עקבית, מצחיקה. לא לגעת בכיוון.</p><span class="pill-state" data-s="good">חזק</span></div>
+          <div class="status"><h4>פריסה במובייל</h4><p>כפתור ההתחלה וכפתורי השיתוף מתחת לקפל במסכים נמוכים.</p><span class="pill-state" data-s="fix">דורש תיקון</span></div>
+          <div class="status"><h4>קריאוּת</h4><p>טובה מאוד, חוץ מכתב היד הדק ומהחותמת.</p><span class="pill-state" data-s="mid">כמעט</span></div>
+          <div class="status"><h4>נגישות</h4><p>ניגודיות 5:1 ומעלה, ARIA במקומות הנכונים. יעד מגע אחד קטן.</p><span class="pill-state" data-s="good">טוב</span></div>
+          <div class="status"><h4>תנועה</h4><p>כניסה מצוינת, אבל 8 לולאות אינסופיות ברקע.</p><span class="pill-state" data-s="mid">יותר מדי</span></div>
+          <div class="status"><h4>לולאת השיתוף</h4><p>מסך האתגר והשיתוף הם הלב הוויראלי, ושם רוב הבעיות.</p><span class="pill-state" data-s="fix">דורש תיקון</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>חמשת הדברים הראשונים לתקן</h2>
+        <ol>
+          <li><b>כפתור ״יאללה, מודדים״ מתחת לקפל.</b> באייפון SE תחתית הכפתור ב־684px כשהמסך 667px. באייפון רגיל בספארי או בדפדפן של וואטסאפ רואים בערך 664px, והכפתור נגמר ב־699px. <button class="ref-btn" data-ref="I1">I1</button> <button class="ref-btn" data-ref="I6">I6</button></li>
+          <li><b>כפתורי השיתוף מתחת לקפל.</b> במסך התוצאה כפתור וואטסאפ נגמר ב־695–704px. בטלפון אמיתי יש גם כפתור ״שיתוף״ של המערכת, ושלושת הכפתורים נשברים לשתי שורות. <button class="ref-btn" data-ref="R2">R2</button> <button class="ref-btn" data-ref="R3">R3</button></li>
+          <li><b>המחט מסתירה את ״יחידות: 0מאל״.</b> זה קורה בכל תוצאה בין 40% ל־60%, ועד שיוגדרו ציונים כולם מקבלים בדיוק 50%. <button class="ref-btn" data-ref="R1">R1</button></li>
+          <li><b>כתב היד כמעט לא קריא בטלפון.</b> Amatic SC בעברית דק ודחוס, ובשורות המדידה הוא גם בצבע המשני. <button class="ref-btn" data-ref="G1">G1</button></li>
+          <li><b>136px של כותרות לפני כל שאלה.</b> ב־SE זה 20% מהמסך, והתשובה החמישית בשאלה 8 יוצאת מהמסך. <button class="ref-btn" data-ref="Q1">Q1</button> <button class="ref-btn" data-ref="Q4">Q4</button></li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>מה כדאי לשמור</h2>
+        <ul>
+          <li>הצללים שנופלים שמאלה־למטה כי האור מגיע מימין. פרט שרק מי שחשב על עברית היה שם לב אליו.</li>
+          <li>סמל השלום בתור ש׳ בלוגו. מותג שאפשר לצייר על מפית.</li>
+          <li>הדואוטון בקולאז׳: צילום בגווני אפור מוכפל בצבע הכרטיס, והשחור הופך לדיו. מחבר תמונות ארכיון לפלטה עליזה.</li>
+          <li>צבע הרקע שמשתנה בכל שאלה. נותן קצב ותחושת התקדמות בלי מילה אחת.</li>
+          <li>המחוג: ״מחפש״ במסך המדידה ומתייצב בקפיץ מרוסן בתוצאה. 0% זה ימינה ו־100% זה שמאלה, ממש.</li>
+          <li>הניווט: כל שאלה נכנסת להיסטוריה, אז ״אחורה״ בטלפון חוזר שאלה אחת ולא יוצא מהאתר. ורענון באמצע ממשיך מאותה נקודה.</li>
+          <li>נגישות: סרגל התקדמות עם <code>aria-valuetext</code>, פוקוס על כותרת כל שאלה, <code>aria-live</code> במדידה ובהודעות, והגדרת ״הפחתת תנועה״ מכובדת בכל מקום, כולל הקונפטי.</li>
+          <li>מגע: אפקטי ריחוף מוגבלים ל־<code>(hover: hover)</code>, אז אין ״ריחוף תקוע״ בטלפון.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>איך נבדק</h2>
+        <p>צילמתי ומדדתי את כל המסכים עם Playwright בשבעה גדלים, מ־360×640 ועד 1440×900. הבדיקה כללה כניסה מקישור ששותף, שאלה עם חמש תשובות ארוכות, מצב אחרי בחירה ותוצאות של 5%, 50% ו־92%. חישבתי ניגודיות WCAG לכל זוג צבעים, ועברתי על <code>index.html</code>, <code>style.css</code> ו־<code>app.js</code> מול שתי רשימות בדיקה שהורדתי לצורך הסקירה: <a href="https://github.com/vercel-labs/web-interface-guidelines" target="_blank" rel="noopener">Web Interface Guidelines</a> של Vercel והסקיל <a href="https://github.com/anthropics/skills/tree/main/skills/frontend-design" target="_blank" rel="noopener">frontend-design</a> של Anthropic.</p>
+        <p>כל ההצעות במעבדה רצות על עותק של הקוד האמיתי של האתר, עם שכבת CSS ו־JS קטנה מעליו. מה שרואים במעבדה הוא מה שיתקבל אחרי היישום.</p>
+      </section>
+
+      <section>
+        <h2>מדידות: לפני ואחרי ההמלצה</h2>
+        <p>תחתית כל אלמנט בפיקסלים מראש המסך. אדום: מחוץ לשטח הגלוי. ירוק: גלוי בלי גלילה. ״אחרי״ הוא סט ״ההמלצה שלי״.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>מכשיר (שטח גלוי)</th><th>כפתור ההתחלה</th><th>כפתור, כניסה מקישור</th><th>כרטיס שאלה 8</th><th>כפתור וואטסאפ</th></tr></thead>
+            <tbody id="measure-body"></tbody>
+          </table>
+        </div>
+        <p class="small">390×664 הוא אייפון 14/15 בספארי עם הסרגלים, ובערך גם הדפדפן הפנימי של וואטסאפ. ב־360×640 התשובה החמישית בשאלה 8 עדיין דורשת גלילה קצרה, וזה בסדר.</p>
+
+        <h3>ניגודיות צבעים</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>טקסט על רקע</th><th>יחס</th><th>WCAG AA</th></tr></thead>
+            <tbody>
+              <tr><td>טקסט משני (ink-2) על נייר</td><td>7.4:1</td><td class="v-ok">עובר</td></tr>
+              <tr><td>דיו על כפתור קורל</td><td>6.3:1</td><td class="v-ok">עובר</td></tr>
+              <tr><td>דיו על מנטה (וואטסאפ)</td><td>8.3:1</td><td class="v-ok">עובר</td></tr>
+              <tr><td>דיו על לילך / שמיים / ורוד</td><td>6.7 / 7.1 / 7.6:1</td><td class="v-ok">עובר</td></tr>
+              <tr><td>דיו על הכחול של ״ימני.ת מבטן ומלידה״</td><td>5.1:1</td><td class="v-ok">עובר</td></tr>
+              <tr><td>תשובה שלא נבחרה, אחרי בחירה (דהייה 45%)</td><td>2.8:1</td><td class="v-bad">נכשל (מצב חולף)</td></tr>
+              <tr><td>אותה תשובה עם Q5 (דהייה 62%)</td><td>4.6:1</td><td class="v-ok">עובר</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>ממצאים לפי מסך</h2>
+
+        <h3>מסך הפתיחה</h3>
+        <div class="finding"><h4><span class="sev" data-sev="critical">קריטי</span>הכפתור הראשי מתחת לקפל</h4><p>הקולאז׳ בנוי ביחס 1:0.9, אבל הכרטיסים תופסים רק כ־78% מהגובה, כך שמתחתיו נשארים כ־70px ריקים ועוד רווח של 22px. אלה בדיוק הפיקסלים שחסרים לכפתור. רוב הכניסות יגיעו מקישור בוואטסאפ, כלומר מהדפדפן הפנימי שלו, שבו המסך הגלוי הכי נמוך.</p><div class="refs"><button class="ref-btn" data-ref="I1">I1 פתיחה מהודקת</button><button class="ref-btn" data-ref="I2">I2 כפתור צף</button><button class="ref-btn" data-ref="I3">I3 כפתור לפני הקולאז׳</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>הכניסה מקישור של חבר.ה היא פסקה</h4><p>מי שנכנס.ה מקישור ששותף רואה ״מי ששלח.ה לך את הקישור קיבל.ה 73%…״ בתוך פתק צהוב. זה הרגע הכי חשוב לוויראליות, אבל המספר קבור בתוך משפט. הפתק גם דוחף את הכפתור עוד 90px למטה, ל־774px ב־SE, ותגית ״חידון סאטירי · 9 שאלות״ חוזרת על מידע.</p><div class="refs"><button class="ref-btn" data-ref="I6">I6 כרטיס אתגר</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="medium">בינוני</span>התוויות של פרס ואלוני נחתכות</h4><p>התווית ״שמעון פרס״ נכנסת מתחת לכרטיס של רבין, והאות ש׳ נעלמת. גם ״שולמית אלוני״ נוגעת בקצה. בקולאז׳ שכולו מדבקות מדויקות, שם חתוך נראה כמו באג.</p><div class="refs"><button class="ref-btn" data-ref="I4">I4</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="medium">בינוני</span>שמונה לולאות תנועה במקביל</h4><p>שלושה כרטיסים מתנדנדים, יונה עפה, שלושה ניצוצות מהבהבים, חותמת מסתובבת ונקודה מהבהבת, כולם בלי סוף. זה מושך את העין מהכפתור, צורך סוללה, ומפר את WCAG 2.2.2, שדורש דרך לעצור תנועה שנמשכת יותר מחמש שניות.</p><div class="refs"><button class="ref-btn" data-ref="G3">G3</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="low">נמוך</span>החותמת לא קריאה</h4><p>״מדע מדויק ✦ בערך״ יוצא בגודל של כ־8.5px בטלפון. כל אות מקבלת זווית שווה בלי קשר לרוחב שלה, ולכן נפתחים חורים (״מדו יק״).</p><div class="refs"><button class="ref-btn" data-ref="I5">I5</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>״צוות הכיול״ בכתב דק</h4><p>אחת הבדיחות הטובות בעמוד כתובה ב־Amatic SC, שבעברית דק מאוד. אותה בעיה בשורות המדידה ובקריאה לשיתוף.</p><div class="refs"><button class="ref-btn" data-ref="G1">G1</button></div></div>
+
+        <h3>השאלון</h3>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>הרבה כרום לפני השאלה</h4><p>לוגו של 44px, רווח, שורת חזרה והתקדמות של 40px ועוד 36px עד הכרטיס, יחד 136px. בשאלה 8 הכרטיס נגמר ב־783px ב־SE, אז התשובה האחרונה לא נראית, וגם לא ברור שיש עוד תשובה.</p><div class="refs"><button class="ref-btn" data-ref="Q1">Q1</button><button class="ref-btn" data-ref="Q4">Q4</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="medium">בינוני</span>כפתור החזרה כבד מדי וקטן מדי</h4><p>יש לו צל מלא כמו לתשובות, כלומר אותו משקל כמו פעולה ראשית, וגובהו 40px, מתחת ל־44px המומלצים ליעד מגע.</p><div class="refs"><button class="ref-btn" data-ref="Q2">Q2</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="low">נמוך</span>שני מוני שאלות</h4><p>״1/9״ ליד הסרגל ו״שאלה 1״ על הכרטיס מראים את אותו מספר. פס רציף גם לא מראה כמה צעדים נשארו. זה אופציונלי, ותלוי בטעם.</p><div class="refs"><button class="ref-btn" data-ref="Q3">Q3</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="low">נמוך</span>הדהייה אחרי בחירה חזקה מדי</h4><p>בזמן המעבר של 620ms לשאלה הבאה, שאר התשובות יורדות לניגודיות של 2.8:1. אנשים קוראים בדיוק אז מה לא בחרו, וזה חלק מהבדיחה.</p><div class="refs"><button class="ref-btn" data-ref="Q5">Q5</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="low">נמוך</span>האותיות על התשובות לא עובדות במקלדת</h4><p>על הכפתורים כתוב א/ב/ג, אבל רק המקשים 1–4 עונים. זה רלוונטי רק לדסקטופ.</p><div class="refs"><button class="ref-btn" data-ref="D3">D3</button></div></div>
+
+        <h3>מסך המדידה</h3>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>השורות המצחיקות הכי קשות לקריאה</h4><p>״בודקים אם יש לך מנוי להארץ…״ מופיע ב־Amatic SC בצבע המשני, במשך פחות משנייה לכל שורה. המחט המחפשת עצמה מצוינת.</p><div class="refs"><button class="ref-btn" data-ref="G1">G1</button></div></div>
+
+        <h3>התוצאה והשיתוף</h3>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>תווית היחידות במסלול המחט</h4><p>״יחידות: 0מאל״ יושבת בדיוק מתחת לאמצע הקשת. כל תוצאה סביב 50% מכסה אותה, ועד שיוגדרו ציונים כולם מקבלים 50%.</p><div class="refs"><button class="ref-btn" data-ref="R1">R1</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="high">גבוה</span>השיתוף מתחת לקפל, ובלי פעולה ראשית</h4><p>כרטיס התוצאה גבוה כ־500px. בטלפון אמיתי <code>navigator.share</code> קיים, ולכן מופיעים שלושה כפתורים באותו גודל שנשברים לשתי שורות. אין פעולה אחת שבולטת, ובמכשירים נמוכים אף כפתור לא גלוי בלי גלילה.</p><div class="refs"><button class="ref-btn" data-ref="R2">R2</button><button class="ref-btn" data-ref="R3">R3</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="medium">בינוני</span>״שתפו ותראו מי יותר״</h4><p>המשפט נקטע, ולא כתוב מי יותר מה. הוא גם כתוב בכתב הדק.</p><div class="refs"><button class="ref-btn" data-ref="R4">R4</button><button class="ref-btn" data-ref="G1">G1</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="medium">בינוני</span>ה־0 של המותג נעלם במסך הכי משותף</h4><p>בלוגו ה־0 הוא סמל שלום. ב״רמת ה0מאלנות שלך״ וב״0מאלני.ת בוער.ת״ מופיעה הספרה אפס בגופן רגיל, ובטלפון זה נקרא כמו שגיאת הקלדה.</p><div class="refs"><button class="ref-btn" data-ref="G2">G2</button></div></div>
+
+        <h3>כללי</h3>
+        <div class="finding"><h4><span class="sev" data-sev="taste">טעם אישי</span>הגרעיניות מעל הטקסט</h4><p>שכבת הרעש יושבת מעל כל התוכן (<code>z-index: 100</code>). זה נותן תחושת דפוס, אבל מלכלך טקסט קטן על הכרטיסים הלבנים.</p><div class="refs"><button class="ref-btn" data-ref="G4">G4</button></div></div>
+        <div class="finding"><h4><span class="sev" data-sev="low">נמוך</span>דסקטופ וטאבלט</h4><p>ב־1440px הפתיחה נראית קטנה, עם המון חלל סביב קולאז׳ של כ־560px. בין 560 ל־899px הכפתור נמתח לכל הרוחב, עד כ־790px.</p><div class="refs"><button class="ref-btn" data-ref="D1">D1</button><button class="ref-btn" data-ref="D2">D2</button></div></div>
+      </section>
+
+      <section>
+        <h2>הערות שלא נכנסו למעבדה</h2>
+        <ul>
+          <li><b>תמונת השיתוף.</b> כשוואטסאפ מציג תצוגה ממוזערת ריבועית, הוא חותך את מרכז ה־1200×630, ונשארים רבין ואמצע הלוגו (״מאלנו״). כדאי לרכז את הלוגו באזור ריבועי במרכז. בנוסף, קישור מתוצאה (<code>?s=73</code>) מציג את אותה תמונה כללית. אפשר להכין חמש תמונות, אחת לכל מדרגה, וחמישה דפים סטטיים קטנים, כי GitHub Pages לא מריץ שרת.</li>
+          <li><b>טקסט חלופי כפול.</b> לתמונות בקולאז׳ יש <code>alt</code> עם השם וגם <code>figcaption</code> עם אותו שם, אז קורא מסך מקריא כל שם פעמיים. <code>alt=""</code> מספיק.</li>
+          <li><b>צבע סרגל הדפדפן.</b> <code>theme-color</code> קבוע על צבע הנייר, בזמן שהרקע משתנה בכל שאלה ובתוצאה. אפשר לעדכן אותו בכל מעבר מסך, כדי שסרגל הדפדפן בטלפון ייראה חלק מהעיצוב.</li>
+          <li><b>לשון.</b> הממשק כתוב בלשון מכלילה (את.ה, שמאלני.ת), אבל חלק מהשאלות בלשון זכר: ״איזה רבין אתה היום?״, ״תבחר״, ״אני הולך״. אם זה מכוון, מצוין. אם לא, כדאי ליישר.</li>
+          <li><b>מצב לרוחב באייפון.</b> הוגדר <code>viewport-fit=cover</code>, אבל הריפוד בצדדים לא מוסיף <code>env(safe-area-inset-left/right)</code>, אז במצב לרוחב התוכן יכול להיכנס מתחת לחריץ.</li>
+          <li><b>גופנים.</b> Fredoka במשקל 500 נטען בשביל תווית אחת, ״יחידות: 0מאל״. אפשר לעבור ל־600 ולחסוך קובץ.</li>
+          <li><b>״למדוד שוב״</b> מאפס בלי אישור. בחידון של שתי דקות זה בסדר, ולא הייתי משנה.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>סדר יישום מומלץ</h2>
+        <ol>
+          <li><b>גל ראשון, CSS כמעט בלבד:</b> R1, I1, R2, R3, Q1, Q4, I4, R4. זה סוגר את כל בעיות הקפל ואת הבאגים הגלויים.</li>
+          <li><b>גל שני:</b> G1, I6, Q2, G3, Q5. קריאוּת, כניסה מקישור והיררכיה.</li>
+          <li><b>גל שלישי, ליטוש:</b> G2, I5, D1, D2, D3. לפי טעם: G4, Q3, ואחת החלופות I2 או I3 אם I1 לא מספיק.</li>
+        </ol>
+      </section>
+    </article>
+  </section>
+
+  <!-- ================= סיכום ================= -->
+  <section id="tab-summary" role="tabpanel" aria-labelledby="tab-btn-summary" hidden>
+    <div class="summary">
+      <div class="sum-cols">
+        <div class="sum-box"><h2>מאושר (<span id="sum-on-count">0</span>)</h2><ul id="sum-on"></ul></div>
+        <div class="sum-box"><h2>לא מאושר (<span id="sum-off-count">0</span>)</h2><ul id="sum-off"></ul></div>
+      </div>
+      <div class="sum-box export">
+        <h2>הטקסט לשליחה</h2>
+        <p class="small">מעתיקים ושולחים לי בצ׳אט, ואני מיישם בדיוק את מה שמסומן. הבחירות נשמרות בדפדפן הזה.</p>
+        <label for="export-text" class="sr-only">הטקסט לשליחה</label>
+        <textarea id="export-text" readonly></textarea>
+        <div class="export-row">
+          <button type="button" class="btn-main" id="copy-btn">העתקת הטקסט</button>
+          <span id="copy-status" class="small" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/*__SITE_SRCDOC__*/
+</script>
+<script>
+(() => {
+  "use strict";
+
+  const SCREENS = [
+    { key: "intro", label: "פתיחה", go: { screen: "intro" } },
+    { key: "challenge", label: "פתיחה מקישור של חבר.ה (73%)", go: { screen: "challenge", pct: 73 } },
+    { key: "q0", label: "שאלה 1 (עם תמונה)", go: { screen: "quiz", q: 0 } },
+    { key: "q7", label: "שאלה 8 (חמש תשובות ארוכות)", go: { screen: "quiz", q: 7 } },
+    { key: "sel", label: "שאלה 9, רגע אחרי בחירה", go: { screen: "selected", q: 8, a: 1 } },
+    { key: "loading", label: "מסך המדידה", go: { screen: "loading" } },
+    { key: "r50", label: "תוצאה 50% (מה שכולם מקבלים כרגע)", go: { screen: "result", pct: 50 } },
+    { key: "r92", label: "תוצאה 92%", go: { screen: "result", pct: 92 } },
+    { key: "r5", label: "תוצאה 5%", go: { screen: "result", pct: 5 } },
+  ];
+
+  const DEVICES = [
+    { key: "safari", label: "אייפון בספארי", w: 390, h: 664 },
+    { key: "se", label: "iPhone SE", w: 375, h: 667 },
+    { key: "small", label: "אנדרואיד קטן", w: 360, h: 640 },
+    { key: "full", label: "אייפון, כל המסך", w: 390, h: 844 },
+    { key: "large", label: "אנדרואיד גדול", w: 412, h: 915 },
+    { key: "tablet", label: "טאבלט", w: 820, h: 1180 },
+    { key: "desktop", label: "דסקטופ", w: 1440, h: 900 },
+  ];
+
+  const GROUPS = [
+    { key: "global", title: "כללי ומותג" },
+    { key: "intro", title: "מסך הפתיחה" },
+    { key: "quiz", title: "השאלון" },
+    { key: "result", title: "התוצאה והשיתוף" },
+    { key: "desktop", title: "דסקטופ וטאבלט (משני)" },
+  ];
+
+  const SEV = { critical: "קריטי", high: "גבוה", medium: "בינוני", low: "נמוך", alt: "חלופה", taste: "טעם אישי" };
+
+  const PROPOSALS = [
+    {
+      id: "G1", group: "global", type: "choice", sev: "high", rec: true,
+      title: "גופן כתב היד",
+      sum: "״צוות הכיול״, שורות המדידה והקריאה לשיתוף דקים מדי לקריאה בטלפון.",
+      screens: ["loading", "intro", "r50"],
+      options: [
+        { key: "amatic", label: "נוכחי (Amatic דק)" },
+        { key: "bold", label: "Amatic מחוזק", classes: ["p-hand-bold"], rec: true },
+        { key: "gveret", label: "גברת לוין (רהוט)", classes: ["p-hand-gveret"] },
+        { key: "playpen", label: "Playpen (רהוט עגול)", classes: ["p-hand-playpen"] },
+      ],
+      problem: "Amatic SC בעברית דק ודחוס מאוד. בשורות המדידה הוא גם בצבע המשני, ובטלפון הקווים כמעט נעלמים. זה בדיוק הטקסט שאמור להצחיק.",
+      change: "Amatic מחוזק: אותו גופן, קו עבה יותר, צבע דיו מלא וגודל גדול בכ־10%. גברת לוין: כתב רהוט נטוי שנראה כמו פתק אמיתי. Playpen: כתב רהוט עגול ושובבי.",
+      why: "ההמלצה היא Amatic מחוזק. הוא שומר על האופי של האתר, כתב דפוס ידני, ומשפר את הקריאוּת בלי גופן נוסף. גברת לוין יפה יותר בתור ״פתק״, אבל כתב רהוט נקרא לאט יותר, במיוחד בשורות שמתחלפות כל שנייה.",
+      cost: "CSS בלבד. שתי החלופות האחרות מוסיפות גופן של 20–40KB, ואז אפשר להוריד את Amatic.",
+    },
+    {
+      id: "G2", group: "global", sev: "medium", rec: true,
+      title: "ה־0 של המותג בתור סמל שלום גם בטקסט",
+      sum: "בלוגו ה־0 הוא סמל שלום. ב״רמת ה0מאלנות שלך״ וב״0מאלני.ת בוער.ת״ הוא סתם הספרה אפס.",
+      screens: ["r92", "r50"], hooks: ["zero"],
+      problem: "בדיחת המותג היא שסמל השלום מחליף את ה־ש׳. בלוגו זה עובד מצוין. בכותרת התוצאה ובתווית שמעל האחוזים מופיעה הספרה 0 בגופן רגיל, וזה נקרא כמו ״אפס־מאלנות״.",
+      change: "כל 0 שצמוד לאות עברית מוחלף בסמל שלום קטן, אותו SVG של הלוגו, עם 0 נסתר בשביל קוראי מסך. מספרים כמו 50% לא משתנים.",
+      why: "עקביות של המותג במסך שהכי הרבה אנשים מצלמים ומשתפים.",
+      cost: "פונקציה קטנה ב־JS שעוטפת את ה־0 אחרי כל עדכון טקסט. התוכן עצמו לא משתנה.",
+    },
+    {
+      id: "G3", group: "global", sev: "medium", rec: true,
+      title: "תנועה רגועה אחרי הכניסה",
+      sum: "שמונה אנימציות אינסופיות רצות במקביל במסך הפתיחה. הכניסה נשארת, הלולאות נעצרות.",
+      screens: ["intro"], classes: ["p-calm"],
+      problem: "הכרטיסים מתנדנדים, היונה עפה, הניצוצות מהבהבים, החותמת מסתובבת והנקודה בתגית מהבהבת, כל הזמן. בטלפון זה מושך את העין מהכפתור וצורך סוללה, וגם מפר את WCAG 2.2.2.",
+      change: "אנימציות הכניסה נשארות כמו שהן. אחריהן היונה עפה פעם אחת, הניצוצות מנצנצים פעמיים, הנקודה מהבהבת ארבע פעמים, הכרטיסים נעצרים והחותמת מסתובבת לאט פי 2.5.",
+      why: "רגע תנועה אחד ומתוזמר חזק יותר מתנועה מפוזרת. כשהעמוד נרגע, העין נוחתת על הכפתור.",
+      cost: "CSS בלבד. ההבדל מורגש בעיקר אחרי כמה שניות, אז כדאי להסתכל על הפתיחה בלי לגעת.",
+    },
+    {
+      id: "G4", group: "global", sev: "taste",
+      title: "גרעיניות מתחת לתוכן",
+      sum: "שכבת הרעש יושבת מעל הכול, גם מעל טקסט וכרטיסים. אפשר להעביר אותה אל הרקע בלבד.",
+      screens: ["q7", "r50", "intro"], classes: ["p-grain-under"],
+      problem: "לשכבה <code>.grain</code> יש <code>z-index: 100</code>, אז הרעש מודפס גם על הטקסט ועל הכרטיסים הלבנים. זה נותן תחושת דפוס, אבל מלכלך טקסט קטן.",
+      change: "הגרעיניות נשארת על הנייר שברקע. הכרטיסים, הכפתורים והטקסט נקיים.",
+      why: "עניין של טעם. כדאי לבדוק בשאלות ובתוצאה, שם יש הכי הרבה טקסט על כרטיס לבן.",
+      cost: "שלוש שורות CSS.",
+    },
+    {
+      id: "I1", group: "intro", sev: "critical", rec: true,
+      title: "פתיחה מהודקת במובייל",
+      sum: "״יאללה, מודדים״ מתחת לקפל ב־SE ובכל דפדפן עם סרגלים. הידוק הקולאז׳ והרווחים מעלה אותו ב־90px.",
+      screens: ["intro", "challenge"], classes: ["p-hero-compact"],
+      problem: "תחתית הכפתור ב־684px ב־375×667, ב־668px ב־360×640, וב־699px באייפון רגיל, כשבספארי או בוואטסאפ רואים בערך 664px. מתחת לקולאז׳ יש כ־70px ריקים, כי הוא בנוי ביחס 1:0.9 והכרטיסים תופסים רק 78% מהגובה.",
+      change: "יחס הקולאז׳ יורד ל־1:0.8 והכרטיסים עולים בהתאם. הרווח בין האזורים יורד מ־22px ל־12px, והריפוד העליון מ־28px ל־16px. התמונות לא קטנות.",
+      why: "רוב התנועה תגיע מקישור בוואטסאפ, שבו השטח הגלוי הכי נמוך. אחרי השינוי הכפתור נגמר ב־595px ב־SE וב־610px באייפון בספארי.",
+      cost: "CSS בלבד, ורק עד 899px.",
+    },
+    {
+      id: "I2", group: "intro", sev: "alt",
+      title: "חלופה: כפתור התחלה צף",
+      sum: "הכפתור נדבק לתחתית המסך בפתיחה, עם מעבר צבע מאחוריו.",
+      screens: ["intro", "challenge"], classes: ["p-cta-sticky"],
+      problem: "אותה בעיה כמו ב־I1: הכפתור לא גלוי במסכים נמוכים.",
+      change: "במובייל הכפתור מקובע לתחתית המסך, עם מרווח בטוח לאזור הבית באייפון, והעמוד גולל מאחוריו.",
+      why: "מבטיח שהכפתור גלוי תמיד, בכל מכשיר ובכל מצב. אפשר לשלב עם I1.",
+      cost: "מכסה חלק מהקולאז׳ ומהשורה הקטנה מתחתיו. CSS בלבד.",
+    },
+    {
+      id: "I3", group: "intro", sev: "alt",
+      title: "חלופה: הכפתור לפני הקולאז׳",
+      sum: "סדר אחר במובייל: כותרת, הסבר, כפתור, ורק אחר כך התמונות.",
+      screens: ["intro"], classes: ["p-cta-first"],
+      problem: "אותה בעיה כמו ב־I1.",
+      change: "במובייל סדר האזורים הופך לכותרת, גוף ואז תמונה. בדסקטופ לא משתנה דבר.",
+      why: "הכפתור עולה לכ־340px. המחיר הוא שהקולאז׳, החלק הכי מצחיק בעמוד, יורד מתחת לקפל, ו״צוות הכיול״ מאבד מהבדיחה.",
+      cost: "שורת CSS אחת.",
+    },
+    {
+      id: "I4", group: "intro", sev: "medium", rec: true,
+      title: "תוויות השמות לא נחתכות",
+      sum: "״שמעון פרס״ נכנס מתחת לכרטיס של רבין, וגם ״שולמית אלוני״ נוגעת בקצה.",
+      screens: ["intro"], classes: ["p-labels"],
+      problem: "התוויות ממורכזות לכרטיס שלהן, והכרטיס של רבין, שמונח מעל, חופף אותן. ככל שהמסך צר יותר, החפיפה גדלה.",
+      change: "התווית של פרס זזה שמאלה, ל־40% מרוחב הכרטיס, והתווית של אלוני ימינה, ל־59%.",
+      why: "שם חתוך נראה כמו באג, ובקולאז׳ של מדבקות מדויקות זה בולט.",
+      cost: "שתי שורות CSS.",
+    },
+    {
+      id: "I5", group: "intro", sev: "low", rec: true,
+      title: "חותמת קריאה",
+      sum: "״מדע מדויק ✦ בערך״ יוצא בגודל של כ־8.5px ועם חורים בין האותיות (״מדו יק״).",
+      screens: ["intro"], classes: ["p-stamp"], hooks: ["stamp"],
+      problem: "כל אות מקבלת זווית שווה, בלי קשר לרוחב שלה. אותיות צרות כמו י׳ ו־ו׳ משאירות חורים.",
+      change: "הזווית של כל אות נקבעת לפי הרוחב האמיתי שלה, שנמדד בדפדפן, והגופן גדל מעט, ל־13.4 יחידות במשקל 600.",
+      why: "החותמת היא אחת הבדיחות הטובות בעמוד, וכרגע כמעט אף אחד לא קורא אותה.",
+      cost: "כ־20 שורות JS במקום הפונקציה הקיימת.",
+    },
+    {
+      id: "I6", group: "intro", sev: "high", rec: true,
+      title: "כניסה מקישור: כרטיס ״לעקוף את ה־73%״",
+      sum: "מי שמגיע.ה מקישור של חבר.ה רואה פסקה צהובה. היא הופכת לכרטיס עם המספר בגדול, ומפנה מקום לכפתור.",
+      screens: ["challenge"], classes: ["p-challenge-card"], hooks: ["challenge"],
+      problem: "זה רגע הכניסה הכי חשוב לוויראליות, והמספר קבור בתוך משפט. הפתק דוחף את הכפתור 90px למטה, ל־774px ב־SE, ותגית המידע שמתחתיו חוזרת על עצמה.",
+      change: "האחוז של השולח.ת מופיע כמדבקה גדולה, ולידה משפט קצר עם שם המדרגה ושורה מודגשת: ״עכשיו תורך לעקוף.״ תגית המידע מוסתרת במצב הזה, הקולאז׳ מצטמצם ל־84% מהרוחב, והכפתור אומר ״יאללה, מודדים ומשווים״.",
+      why: "התחרות היא המנוע של החידון. המספר צריך להיות הדבר הראשון שרואים, והכפתור צריך להבטיח השוואה. אחרי השינוי הכפתור נגמר ב־623px ב־SE.",
+      cost: "שינוי קטן ב־<code>setupChallenge</code> ו־CSS.",
+    },
+    {
+      id: "Q1", group: "quiz", sev: "high", rec: true,
+      title: "כותרת שאלון קומפקטית",
+      sum: "136px של לוגו, כפתור וסרגל לפני שהשאלה מתחילה. ב־SE זה 20% מהמסך.",
+      screens: ["q7", "q0", "sel", "loading", "r50"], classes: ["p-header-compact"],
+      problem: "הלוגו העליון (44px), רווח, שורת החזרה וההתקדמות (40px) ועוד 36px עד הכרטיס. בשאלה 8 הכרטיס נגמר ב־783px ב־SE.",
+      change: "הלוגו קטן יותר (1.15rem) וקרוב יותר לקצה, הריפוד העליון 10px, ו־28px לפני הכרטיס, מספיק לתגית ״שאלה 8״ שבולטת למעלה. אותו הידוק חל על מסכי המדידה והתוצאה.",
+      why: "באמצע החידון הלוגו כבר לא עושה עבודה, והתשובות כן.",
+      cost: "CSS בלבד, ורק עד 899px.",
+    },
+    {
+      id: "Q2", group: "quiz", sev: "medium", rec: true,
+      title: "כפתור חזרה שקט, 44px",
+      sum: "״חזרה״ נראה כבד כמו פעולה ראשית, עם צל מלא, וגובהו 40px בלבד.",
+      screens: ["q0", "q7"], classes: ["p-back-quiet"],
+      problem: "לכפתור משני יש אותו משקל ויזואלי כמו לתשובות, והוא קטן מ־44px, הגודל המומלץ ליעד מגע.",
+      change: "עיגול של 44×44 עם חץ בלבד, בלי צל ובלי רקע. המילה ״חזרה״ נשארת לקוראי מסך.",
+      why: "היררכיה: העין צריכה ללכת לשאלה ולא לחזרה. בנוסף, יעד מגע מדויק יותר.",
+      cost: "CSS בלבד.",
+    },
+    {
+      id: "Q3", group: "quiz", sev: "taste",
+      title: "סרגל התקדמות מקוטע",
+      sum: "תשע גלולות במקום פס רציף, וכל שאלה שעברה נצבעת בצבע שלה.",
+      screens: ["q7", "q0", "sel"], classes: ["p-progress-seg"], hooks: ["pseg"],
+      problem: "פס רציף לתשעה צעדים בדידים לא מראה כמה נשארו. בנוסף, ״1/9״ ו״שאלה 1״ מראים את אותו מספר.",
+      change: "תשעה מקטעים. שאלות שנענו בצבע שלהן, והנוכחית מפוספסת ומוגבהת.",
+      why: "צבעי השאלות כבר משתנים בכל שאלה, והסרגל הופך לתיעוד צבעוני של הדרך. אופציונלי.",
+      cost: "כ־25 שורות JS ו־CSS.",
+    },
+    {
+      id: "Q4", group: "quiz", sev: "medium", rec: true,
+      title: "תשובות מהודקות במובייל",
+      sum: "חמש תשובות של שתי שורות יוצרות כרטיס של 647px ב־SE.",
+      screens: ["q7", "sel"], classes: ["p-answers-compact"],
+      problem: "גובה מינימלי של 62px, ריפוד של 12px ורווח של 12px בין תשובות. בשאלה עם חמש תשובות ארוכות זה מצטבר.",
+      change: "גובה מינימלי 54px, ריפוד 9/12px, רווח 10px ועיגול אות של 2.05rem. גודל הטקסט לא משתנה.",
+      why: "יחד עם Q1, הכרטיס של שאלה 8 נגמר ב־641px ב־SE, וכל התשובות גלויות בלי גלילה.",
+      cost: "CSS בלבד.",
+    },
+    {
+      id: "Q5", group: "quiz", sev: "low", rec: true,
+      title: "התשובות שלא נבחרו נשארות קריאות",
+      sum: "אחרי בחירה שאר התשובות דוהות ל־45%, ניגודיות של 2.8:1.",
+      screens: ["sel"], classes: ["p-fade-soft"],
+      problem: "בזמן המעבר לשאלה הבאה הטקסט כמעט נעלם.",
+      change: "דהייה ל־62%, ניגודיות של 4.6:1. הבחירה עדיין בולטת בצבע ובסימן ה־✓.",
+      why: "בדיוק ברגע הזה אנשים קוראים מה לא בחרו, וזה חלק מהבדיחה.",
+      cost: "שורה אחת.",
+    },
+    {
+      id: "R1", group: "result", sev: "high", rec: true,
+      title: "תווית היחידות יוצאת ממסלול המחט",
+      sum: "המחט מכסה את ״יחידות: 0מאל״ בכל תוצאה בין 40% ל־60%, וכרגע כולם מקבלים 50%.",
+      screens: ["r50", "r92", "r5"], hooks: ["unit"],
+      problem: "התווית יושבת בדיוק במסלול המחט. עד שיוגדרו ציונים, כל מי שעונה מקבל 50%, ולכן כל משתמש רואה טקסט מוסתר במרכז המסך הכי חשוב.",
+      change: "בית המחוג מתארך ב־13 יחידות, ו״שמאל, יחידות: 0מאל, ימין״ יושבות בשורה אחת מתחת לציר, מחוץ להישג המחט.",
+      why: "כמו לוח שעונים אמיתי: היחידות כתובות על הלוח, לא מתחת למחוג.",
+      cost: "שינוי קטן ב־<code>buildGauge</code>: נתיב הבית ומיקום של שלוש תוויות.",
+    },
+    {
+      id: "R2", group: "result", sev: "high", rec: true,
+      title: "כרטיס תוצאה קומפקטי במובייל",
+      sum: "כרטיס התוצאה, כ־500px, דוחף את כפתורי השיתוף מתחת לקפל.",
+      screens: ["r50", "r92", "r5"], classes: ["p-result-compact"],
+      problem: "כפתור וואטסאפ נגמר ב־695px ב־SE וב־704px באייפון, כשבספארי רואים בערך 664px. השיתוף הוא כל הלולאה הוויראלית.",
+      change: "המחוג ברוחב של עד 290px, האחוזים עד 4.4rem, והריפוד, הרווחים והכותרת מעט קטנים יותר.",
+      why: "יחד עם R3 כפתור וואטסאפ נגמר ב־621px ב־SE. התוצאה עדיין הגיבור של המסך.",
+      cost: "CSS בלבד, ורק עד 899px.",
+    },
+    {
+      id: "R3", group: "result", type: "choice", sev: "high", rec: true,
+      title: "פריסת כפתורי השיתוף",
+      sum: "בטלפון אמיתי יש שלושה כפתורים באותו גודל, והם נשברים לשתי שורות לא מאוזנות.",
+      screens: ["r50", "r92"],
+      options: [
+        { key: "current", label: "נוכחי" },
+        { key: "stack", label: "וואטסאפ גדול מעל", classes: ["p-share-stack"], rec: true },
+        { key: "sticky", label: "סרגל דביק בתחתית", classes: ["p-share-sticky"] },
+      ],
+      problem: "<code>navigator.share</code> קיים כמעט בכל טלפון, אז כפתור ״שיתוף״ מופיע: שניים בשורה הראשונה ואחד בשנייה. כל הכפתורים באותו גודל, ואין פעולה ראשית. בתצוגה כאן הכפתור הזה מוצג תמיד, כמו בטלפון.",
+      change: "וואטסאפ גדול מעל: וואטסאפ ברוחב מלא ובגובה 58px, ומתחתיו העתקה ושיתוף חצי־חצי. סרגל דביק: וואטסאפ רחב ושני כפתורי אייקון שמקובעים לתחתית המסך.",
+      why: "ההמלצה היא וואטסאפ גדול מעל. הסרגל הדביק תמיד גלוי, אבל מסתיר את טקסט התוצאה בזמן הקריאה ונראה פחות חלק מהעיצוב.",
+      cost: "CSS בלבד.",
+    },
+    {
+      id: "R4", group: "result", sev: "medium", rec: true,
+      title: "קריאה לשיתוף במשפט שלם",
+      sum: "״שתפו ותראו מי יותר״ נקטע באמצע. מי יותר מה?",
+      screens: ["r50"], hooks: ["sharecopy"],
+      problem: "הכותרת מעל כפתורי השיתוף לא אומרת מה יקרה ולמי שולחים.",
+      change: "״שלחו לקבוצה ותראו מי יותר 0מאלני.ת״: משפט שלם, הוראה ברורה ומשחק המילים של המותג.",
+      why: "״לקבוצה״ מתחבר לכפתור הוואטסאפ ולהודעה שכבר קיימת אחרי העתקה, ״להדביק בקבוצה של המשפחה״.",
+      cost: "שינוי טקסט ב־HTML.",
+    },
+    {
+      id: "D1", group: "desktop", sev: "low", rec: true, device: "desktop",
+      title: "דסקטופ: קולאז׳ גדול יותר",
+      sum: "ב־1440px הפתיחה נראית קטנה, עם המון חלל סביב קולאז׳ של כ־560px.",
+      screens: ["intro"], classes: ["p-desktop"],
+      problem: "המסגרת מוגבלת ל־1200px, ועמודת התמונה מקבלת רק קצת יותר מחצי.",
+      change: "רוחב כולל של 1240px, עמודת תמונה של 1.15fr, קולאז׳ עד 720px ופסקה צרה יותר.",
+      why: "בדסקטופ יש מקום, והקולאז׳ הוא הגיבור. כדי לראות, בחרו מכשיר ״דסקטופ״.",
+      cost: "CSS בלבד, רק מ־900px.",
+    },
+    {
+      id: "D2", group: "desktop", sev: "low", rec: true, device: "tablet",
+      title: "טאבלט: כפתור ברוחב סביר",
+      sum: "בין 560px ל־899px הכפתור נמתח לכל הרוחב, עד כ־790px.",
+      screens: ["intro"], classes: ["p-tablet"],
+      problem: "כפתור ענק ומתוח נראה כמו באנר ולא כמו כפתור. רלוונטי לטאבלטים ולטלפונים מתקפלים.",
+      change: "רוחב מקסימלי של 440px, מיושר לימין כמו הטקסט.",
+      why: "שומר על היחס בין הכפתור לכותרת. כדי לראות, בחרו מכשיר ״טאבלט״.",
+      cost: "CSS בלבד.",
+    },
+    {
+      id: "D3", group: "desktop", sev: "low", rec: true, device: "desktop",
+      title: "מקשי האותיות עונים",
+      sum: "על התשובות כתוב א/ב/ג, אבל במקלדת עובדים רק המספרים.",
+      screens: ["q7"], hooks: ["keys"],
+      problem: "הרמז אומר ״מקשי המספרים״, והכפתורים מראים אותיות.",
+      change: "גם האותיות א–ח במקלדת עברית עונות, והרמז מתעדכן בהתאם.",
+      why: "מה שכתוב על הכפתור צריך לעבוד. רלוונטי רק לדסקטופ, כי במגע הרמז מוסתר.",
+      cost: "כ־10 שורות JS.",
+    },
+  ];
+
+  const PRESETS = {
+    none: () => ({}),
+    rec: () => Object.fromEntries(PROPOSALS.filter((p) => p.rec).map((p) => [p.id, p.type === "choice" ? recOption(p).key : true])),
+    critical: () => Object.fromEntries(PROPOSALS.filter((p) => p.sev === "critical" || p.sev === "high").map((p) => [p.id, p.type === "choice" ? recOption(p).key : true])),
+    all: () => Object.fromEntries(PROPOSALS.map((p) => [p.id, p.type === "choice" ? recOption(p).key : true])),
+  };
+  function recOption(p) { return p.options.find((o) => o.rec) || p.options[1]; }
+
+  const MEASURE = [
+    { dev: "360×640", fold: 640, rows: [[668, 581], [758, 635], [783, 710], [686, 656]] },
+    { dev: "375×667 (SE)", fold: 667, rows: [[684, 595], [774, 623], [783, 641], [695, 621]] },
+    { dev: "390×664 (אייפון בספארי)", fold: 664, rows: [[699, 610], [790, 635], [683, 610], [704, 622]] },
+    { dev: "412×915", fold: 915, rows: [[723, 631], [814, 654], [683, 610], [718, 600]] },
+  ];
+
+  /* ---------------- מצב ---------------- */
+  const STORE = "smolometer-lab:v1";
+  const isOn = (p) => (p.type === "choice" ? !!sel[p.id] && sel[p.id] !== p.options[0].key : !!sel[p.id]);
+  let sel = load();
+  let screenKey = "intro";
+  let deviceKey = "safari";
+  let mode = window.innerWidth >= 700 ? "both" : "after";
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE);
+      if (raw) return JSON.parse(raw) || {};
+    } catch (e) {}
+    return PRESETS.rec();
+  }
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(sel)); } catch (e) {}
+  }
+
+  /* ---------------- מסגרות ---------------- */
+  const $ = (s) => document.querySelector(s);
+  const framesEl = $("#frames");
+  const frames = {};
+  for (const fig of framesEl.querySelectorAll(".frame")) {
+    const side = fig.dataset.side;
+    frames[side] = { side, fig, device: fig.querySelector(".device"), iframe: fig.querySelector("iframe"), ready: false };
+  }
+  const other = (f) => (f.side === "before" ? frames.after : frames.before);
+
+  function activePatches() {
+    const classes = [];
+    const hooks = [];
+    for (const p of PROPOSALS) {
+      let src = null;
+      if (p.type === "choice") src = p.options.find((o) => o.key === sel[p.id]) || null;
+      else if (sel[p.id]) src = p;
+      if (!src) continue;
+      classes.push(...(src.classes || []));
+      hooks.push(...(src.hooks || []));
+    }
+    return { classes, hooks };
+  }
+  function post(f, msg) {
+    if (f.ready && f.iframe.contentWindow) f.iframe.contentWindow.postMessage(Object.assign({ lab: 1 }, msg), "*");
+  }
+  function sendPatches() {
+    post(frames.after, Object.assign({ cmd: "patches" }, activePatches()));
+  }
+  function sendGoto(f) {
+    const s = SCREENS.find((x) => x.key === screenKey);
+    post(f, Object.assign({ cmd: "goto" }, s.go));
+  }
+  window.addEventListener("message", (e) => {
+    const f = Object.values(frames).find((x) => x.iframe.contentWindow === e.source);
+    if (!f || !e.data || !e.data.lab) return;
+    if (e.data.ready) {
+      f.ready = true;
+      post(f, Object.assign({ cmd: "patches" }, f.side === "after" ? activePatches() : { classes: [], hooks: [] }));
+      sendGoto(f);
+    }
+    if (typeof e.data.scroll === "number" && mode === "both") post(other(f), { cmd: "scroll", y: e.data.scroll });
+  });
+  for (const f of Object.values(frames)) f.iframe.srcdoc = SITE_SRCDOC;
+
+  function layout() {
+    const dev = DEVICES.find((d) => d.key === deviceKey);
+    const box = framesEl.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const shown = Object.values(frames).filter((f) => !f.fig.hidden);
+    const gap = 12;
+    const capH = 22;
+    const availW = (box.width - gap * (shown.length - 1)) / shown.length;
+    const availH = box.height - capH;
+    const s = Math.max(0.12, Math.min(availW / dev.w, availH / dev.h, 1));
+    for (const f of Object.values(frames)) {
+      f.device.style.width = `${Math.floor(dev.w * s)}px`;
+      f.device.style.height = `${Math.floor(dev.h * s)}px`;
+      f.iframe.style.width = `${dev.w}px`;
+      f.iframe.style.height = `${dev.h}px`;
+      f.iframe.style.transform = `scale(${s})`;
+    }
+  }
+  new ResizeObserver(layout).observe(framesEl);
+
+  /* ---------------- סרגל הבמה ---------------- */
+  const screenSelect = $("#screen-select");
+  const deviceSelect = $("#device-select");
+  screenSelect.innerHTML = SCREENS.map((s) => `<option value="${s.key}">מסך: ${s.label}</option>`).join("");
+  deviceSelect.innerHTML = DEVICES.map((d) => `<option value="${d.key}">${d.label}</option>`).join("");
+  screenSelect.addEventListener("change", () => goScreen(screenSelect.value));
+  deviceSelect.addEventListener("change", () => setDevice(deviceSelect.value));
+
+  function goScreen(key) {
+    screenKey = key;
+    screenSelect.value = key;
+    Object.values(frames).forEach(sendGoto);
+    renderStageNote();
+  }
+  function setDevice(key) {
+    deviceKey = key;
+    deviceSelect.value = key;
+    layout();
+    renderStageNote();
+  }
+  function setMode(m) {
+    mode = m;
+    frames.before.fig.hidden = m === "after";
+    frames.after.fig.hidden = m === "before";
+    for (const b of document.querySelectorAll("#mode-seg button")) b.setAttribute("aria-pressed", String(b.dataset.mode === m));
+    layout();
+  }
+  document.querySelectorAll("#mode-seg button").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+  const stage = $("#stage");
+  const expandBtn = $("#expand-btn");
+  function setExpanded(on) {
+    stage.classList.toggle("is-expanded", on);
+    document.body.classList.toggle("no-scroll", on);
+    expandBtn.setAttribute("aria-pressed", String(on));
+    expandBtn.setAttribute("aria-label", on ? "סגירת ההגדלה" : "הגדלת התצוגה");
+    requestAnimationFrame(layout);
+  }
+  expandBtn.addEventListener("click", () => setExpanded(!stage.classList.contains("is-expanded")));
+  const collapseBtn = $("#collapse-btn");
+  collapseBtn.addEventListener("click", () => {
+    const on = !stage.classList.contains("is-collapsed");
+    if (on && stage.classList.contains("is-expanded")) setExpanded(false);
+    stage.classList.toggle("is-collapsed", on);
+    collapseBtn.setAttribute("aria-pressed", String(on));
+    collapseBtn.setAttribute("aria-label", on ? "הצגת התצוגה" : "הסתרת התצוגה");
+    collapseBtn.querySelector("path").setAttribute("d", on ? "M6 9l6 6 6-6" : "M6 15l6-6 6 6");
+    requestAnimationFrame(layout);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && stage.classList.contains("is-expanded")) setExpanded(false);
+  });
+
+  function renderStageNote() {
+    const here = PROPOSALS.filter((p) => isOn(p) && p.screens.includes(screenKey));
+    const relevant = PROPOSALS.filter((p) => p.screens.includes(screenKey));
+    const note = $("#stage-note");
+    note.replaceChildren();
+    const dev = DEVICES.find((d) => d.key === deviceKey);
+    const lead = document.createElement("span");
+    lead.textContent =
+      `${dev.label} \u2066${dev.w}×${dev.h}\u2069. ` +
+      (here.length ? "דלוק במסך הזה:" : `${relevant.length} הצעות נוגעות במסך הזה, אף אחת לא דלוקה.`);
+    note.append(lead);
+    for (const p of here) {
+      const c = document.createElement("span");
+      c.className = "pid-chip";
+      c.textContent = p.id;
+      c.title = p.title;
+      note.append(c);
+    }
+  }
+
+  /* ---------------- כרטיסי הצעות ---------------- */
+  const groupsEl = $("#groups");
+  const jumpRow = $("#jump-row");
+  for (const g of GROUPS) {
+    const items = PROPOSALS.filter((p) => p.group === g.key);
+    const sec = document.createElement("section");
+    sec.className = "group";
+    sec.id = `group-${g.key}`;
+    sec.innerHTML = `<div class="group-head"><h2>${g.title}</h2><span data-gcount="${g.key}"></span></div>`;
+    for (const p of items) sec.append(card(p));
+    groupsEl.append(sec);
+    const a = document.createElement("a");
+    a.href = `#group-${g.key}`;
+    a.textContent = g.title;
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    jumpRow.append(a);
+  }
+
+  function card(p) {
+    const el = document.createElement("article");
+    el.className = "prop";
+    el.id = `prop-${p.id}`;
+    const isChoice = p.type === "choice";
+    const control = isChoice
+      ? `<span class="choice-badge" aria-hidden="true">בחירה</span>`
+      : `<label class="switch"><input type="checkbox" id="t-${p.id}"><span class="track"></span><span class="sr-only">הפעלת ${p.id}</span></label>`;
+    const titleTag = isChoice ? "div" : `label for="t-${p.id}"`;
+    const titleClose = isChoice ? "div" : "label";
+    el.innerHTML = `
+      <div class="prop-head">
+        ${control}
+        <${titleTag} class="prop-title">
+          <h3><span class="pid">${p.id}</span>${p.title}</h3>
+          <p class="prop-sum">${p.sum}</p>
+        </${titleClose}>
+      </div>
+      ${isChoice ? `<div class="choices" role="radiogroup" aria-label="${p.title}">${p.options
+        .map((o) => `<label><input type="radio" name="c-${p.id}" value="${o.key}">${o.label}${o.rec ? " ★" : ""}</label>`)
+        .join("")}</div>` : ""}
+      <div class="prop-meta">
+        <span class="sev" data-sev="${p.sev}">${SEV[p.sev]}</span>
+        ${p.rec ? `<span class="rec-tag">מומלץ</span>` : ""}
+        <button type="button" class="link-btn" data-show="${p.id}">הצגה במסך</button>
+        <button type="button" class="link-btn" data-more aria-expanded="false" aria-controls="more-${p.id}">פרטים</button>
+      </div>
+      <div class="prop-more" id="more-${p.id}" hidden>
+        <dl>
+          <div><dt>הבעיה</dt><dd>${p.problem}</dd></div>
+          <div><dt>השינוי</dt><dd>${p.change}</dd></div>
+          <div><dt>למה</dt><dd>${p.why}</dd></div>
+          <div><dt>מחיר</dt><dd>${p.cost}</dd></div>
+        </dl>
+      </div>`;
+    if (isChoice) {
+      el.querySelectorAll('input[type="radio"]').forEach((r) =>
+        r.addEventListener("change", () => {
+          sel[p.id] = r.value;
+          changed(p, r.value !== p.options[0].key);
+        })
+      );
+    } else {
+      el.querySelector(`#t-${p.id}`).addEventListener("change", (e) => {
+        sel[p.id] = e.target.checked;
+        changed(p, e.target.checked);
+      });
+    }
+    el.querySelector("[data-show]").addEventListener("click", () => showProposal(p));
+    const moreBtn = el.querySelector("[data-more]");
+    moreBtn.addEventListener("click", () => {
+      const more = el.querySelector(".prop-more");
+      more.hidden = !more.hidden;
+      moreBtn.setAttribute("aria-expanded", String(!more.hidden));
+      moreBtn.textContent = more.hidden ? "פרטים" : "פחות";
+    });
+    return el;
+  }
+
+  function showProposal(p) {
+    if (stage.classList.contains("is-collapsed")) collapseBtn.click();
+    if (p.device && deviceKey !== p.device) setDevice(p.device);
+    if (!p.screens.includes(screenKey)) goScreen(p.screens[0]);
+    if (mode === "before") setMode("after");
+  }
+
+  function changed(p, nowOn) {
+    save();
+    sendPatches();
+    if (nowOn) showProposal(p);
+    syncUI();
+  }
+
+  function syncUI() {
+    for (const p of PROPOSALS) {
+      const el = document.getElementById(`prop-${p.id}`);
+      el.classList.toggle("is-on", isOn(p));
+      if (p.type === "choice") {
+        const val = sel[p.id] || p.options[0].key;
+        el.querySelectorAll('input[type="radio"]').forEach((r) => (r.checked = r.value === val));
+      } else {
+        el.querySelector(`#t-${p.id}`).checked = !!sel[p.id];
+      }
+    }
+    const n = PROPOSALS.filter(isOn).length;
+    $("#after-count").textContent = n;
+    $("#foot-count").textContent = n;
+    $("#tab-count").textContent = n;
+    for (const g of GROUPS) {
+      const items = PROPOSALS.filter((p) => p.group === g.key);
+      document.querySelector(`[data-gcount="${g.key}"]`).textContent = `${items.filter(isOn).length} מתוך ${items.length} דלוקות`;
+    }
+    const norm = (state, p) => {
+      const v = state[p.id];
+      if (p.type === "choice") return v && v !== p.options[0].key ? v : false;
+      return !!v;
+    };
+    for (const b of document.querySelectorAll("#presets button")) {
+      const target = PRESETS[b.dataset.preset]();
+      b.classList.toggle("is-on", PROPOSALS.every((p) => norm(target, p) === norm(sel, p)));
+    }
+    renderStageNote();
+    renderSummary();
+  }
+
+  document.querySelectorAll("#presets button").forEach((b) =>
+    b.addEventListener("click", () => {
+      sel = PRESETS[b.dataset.preset]();
+      save();
+      sendPatches();
+      syncUI();
+    })
+  );
+
+  /* ---------------- לשוניות ---------------- */
+  const TABS = ["lab", "review", "summary"];
+  function setTab(name, focus) {
+    for (const t of TABS) {
+      const on = t === name;
+      document.getElementById(`tab-${t}`).hidden = !on;
+      const btn = document.getElementById(`tab-btn-${t}`);
+      btn.setAttribute("aria-selected", String(on));
+      btn.tabIndex = on ? 0 : -1;
+    }
+    if (name === "lab") requestAnimationFrame(layout);
+    if (focus) document.getElementById(`tab-btn-${name}`).focus();
+    window.scrollTo(0, 0);
+  }
+  document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
+  document.querySelector(".tabs").addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const cur = TABS.findIndex((t) => document.getElementById(`tab-btn-${t}`).getAttribute("aria-selected") === "true");
+    const step = e.key === "ArrowLeft" ? 1 : -1;
+    setTab(TABS[(cur + step + TABS.length) % TABS.length], true);
+  });
+  document.querySelectorAll("[data-goto-tab]").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.gotoTab)));
+
+  document.querySelectorAll(".ref-btn").forEach((b) =>
+    b.addEventListener("click", () => {
+      const p = PROPOSALS.find((x) => x.id === b.dataset.ref);
+      if (!p) return;
+      setTab("lab");
+      showProposal(p);
+      const el = document.getElementById(`prop-${p.id}`);
+      const more = el.querySelector(".prop-more");
+      more.hidden = false;
+      const mb = el.querySelector("[data-more]");
+      mb.setAttribute("aria-expanded", "true");
+      mb.textContent = "פחות";
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        el.classList.add("is-flash");
+        setTimeout(() => el.classList.remove("is-flash"), 1400);
+      });
+    })
+  );
+
+  /* ---------------- מדידות ---------------- */
+  $("#measure-body").innerHTML = MEASURE.map(
+    (m) =>
+      `<tr><td>${m.dev}</td>${m.rows
+        .map(([b, a]) => `<td><span class="${b > m.fold ? "v-bad" : "v-ok"}">${b}</span> ← <span class="${a > m.fold ? "v-bad" : "v-ok"}">${a}</span></td>`)
+        .join("")}</tr>`
+  ).join("");
+
+  /* ---------------- סיכום ---------------- */
+  function label(p) {
+    if (p.type === "choice") {
+      const o = p.options.find((x) => x.key === sel[p.id]) || p.options[0];
+      return `${p.title}: ${o.label}`;
+    }
+    return p.title;
+  }
+  function renderSummary() {
+    const on = PROPOSALS.filter(isOn);
+    const off = PROPOSALS.filter((p) => !isOn(p));
+    const li = (p) => `<li><span class="pid">${p.id}</span><span>${label(p)}</span></li>`;
+    $("#sum-on").innerHTML = on.map(li).join("") || `<li>עוד לא נבחר כלום.</li>`;
+    $("#sum-off").innerHTML = off.map(li).join("") || `<li>הכול מאושר.</li>`;
+    $("#sum-on-count").textContent = on.length;
+    $("#sum-off-count").textContent = off.length;
+    const lines = [
+      "ה0מאלנומטר: בחירות מהמעבדה",
+      "",
+      `מאשר.ת (${on.length}):`,
+      ...on.map((p) => `• ${p.id} ${label(p)}`),
+      "",
+      `לא מאשר.ת (${off.length}):`,
+      ...off.map((p) => `• ${p.id} ${label(p)}`),
+    ];
+    $("#export-text").value = lines.join("\n");
+  }
+  $("#copy-btn").addEventListener("click", async () => {
+    const ta = $("#export-text");
+    const status = $("#copy-status");
+    try {
+      await navigator.clipboard.writeText(ta.value);
+      status.textContent = "הועתק. אפשר להדביק בצ׳אט.";
+    } catch (e) {
+      ta.focus();
+      ta.select();
+      status.textContent = "הטקסט מסומן, אפשר להעתיק ידנית.";
+    }
+  });
+
+  /* ---------------- הפעלה ---------------- */
+  setMode(mode);
+  setDevice(deviceKey);
+  syncUI();
+  const hash = (location.hash || "").slice(1);
+  if (TABS.includes(hash)) setTab(hash);
+})();
+</script>
